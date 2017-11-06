@@ -18,7 +18,7 @@ The following is my config and should explain what most things do and why.
 **nginx.conf**
 
 This limits the maximal connections per IP
-```nginx
+```
 worker_processes auto;
 pid /nginx/run/nginx.pid;
 daemon off;
@@ -55,7 +55,6 @@ http {
 <br>The maximum upload size is 25GB
 nginx doesn't send that the webserver is `nginx` but `server`
 ```
-
     client_max_body_size 25G;
 
     aio threads;
@@ -151,7 +150,6 @@ error_page 400 401 402 403 404 500 501 502 503 520 521 533 /error/HTTP$status.ht
 
 <br> This server redirects all of the unencrypted connections to https. It uses the same url, except when it's accessed over the IP address, then it redirects to the root of the domain.
 ```
-
 server {
   listen 8000 default_server;
   server_name _;
