@@ -18,7 +18,7 @@ The following is my config and should explain what most things do and why.
 **nginx.conf**
 
 This limits the maximal connections per IP
-```
+```nginx
 worker_processes auto;
 pid /nginx/run/nginx.pid;
 daemon off;
