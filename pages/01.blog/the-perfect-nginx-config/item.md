@@ -1,10 +1,23 @@
 ---
 title: 'The perfect nginx config'
-published: false
+published: true
+taxonomy:
+    category:
+        - blog
+    tag:
+        - software
+        - Plex
+        - nginx
+visible: true
 ---
 
 I use docker for all of my applications running on my unRAID server, but for nginx I didn't find any image that fulfilled all my needs. So I wrote my own dockerimage which you can find here: https://github.com/Starbix/dockerimages/tree/master/nginx. 
+
+The following is my config and should explain what most things do and why.
+
 **nginx.conf**
+
+This limits the maximal connections per IP
 ```
 worker_processes auto;
 pid /nginx/run/nginx.pid;
@@ -22,7 +35,7 @@ http {
     limit_req_zone $binary_remote_addr zone=allips:10m rate=150r/s;
     limit_req zone=allips burst=150 nodelay;
 ```
-This limits the maximal connections per IP
+<br>The custom log format is needed for [nginx amplify](https://www.nginx.com/products/nginx-amplify/) (statistics and more)
 ```
     include /nginx/conf/mime.types;
     default_type  application/octet-stream;
@@ -39,7 +52,8 @@ This limits the maximal connections per IP
     access_log /nginx/log/nginx_access.log main_ext;
     error_log /nginx/log/nginx_error.log warn;
 ```
-The custom log format is needed for nginx amplify (statistics and more)
+<br>The maximum upload size is 25GB
+nginx doesn't send that the webserver is `nginx` but `server`
 ```
 
     client_max_body_size 25G;
@@ -55,7 +69,8 @@ The custom log format is needed for nginx amplify (statistics and more)
     server_tokens off;
     more_set_headers 'Server: secret';
 ```
-The maximum upload size is 25GB, nginx doesn't send that the webserver is `nginx` but `server`.
+<br>Content will be encoded in [brötli](https://github.com/google/brotli) (which Safari now supports)
+
 ```
     gzip off;
 
@@ -79,16 +94,25 @@ The maximum upload size is 25GB, nginx doesn't send that the webserver is `nginx
         font/opentype
         image/svg+xml;
 ```
-Content will be encoded in brötli (which Safari now supports)
+<br> This will include all config files from /sites-enabled. The following configuration is the part you'll configure yourself. 
 ```
     include /sites-enabled/*.conf;
     include /nginx/custom_sites/*.conf;
     include /nginx/conf.d/stub_status.conf;
 }
 ```
-The preceding configuration is part of the included nginx.conf of my Dockerimage. It will include all config files from /sites-enabled. The following configuration is the part you'll configure yourself.
+The preceding configuration is part of the included nginx.conf of my Dockerimage. 
+<br>
 
 /sites-enabled/**default.conf**
+
+These TLS parameters currently result in a 100% score in all categories on https://www.ssllabs.com/ssltest
+
+- OCSP stapling is enabled you can learn more about it [here](https://scotthelme.co.uk/ocsp-stapling-speeding-up-ssl/)
+- Dynamic TLS Records is enabled which is a patch from [cloudflare](https://blog.cloudflare.com/optimizing-tls-over-tcp-to-reduce-latency/)
+- I use [hybrid certificates](https://scotthelme.co.uk/hybrid-rsa-and-ecdsa-certificates-with-nginx/)
+- [CT](https://www.certificate-transparency.org) support is compiled in using [this module](https://github.com/grahamedgecombe/nginx-ct) to use it you need to submit your certificates to a CT log, you can do it using [this program](https://github.com/grahamedgecombe/ct-submit)
+
 ```
 upstream php-handler {
     server unix:/php/run/php-fpm.sock;
@@ -119,7 +143,8 @@ ssl_ct_static_scts /certs/example.com_ecc;
 ssl_dhparam /certs/dhparam.pem;
 ssl_trusted_certificate /certs/example.com/fullchain.pem;
 ```
-This TLS parameters currently result in a 100% score in all categories, but keep in mind that this kind of config doesn't make sense for most websites and I just use it just because I want 100% everywhere.
+<br>I use custom HTTP error pages and I used this for creating them: https://github.com/AndiDittrich/HttpErrorPages
+
 ```
 error_page 400 /error/HTTP400.html;
 error_page 401 /error/HTTP401.html;
@@ -134,7 +159,7 @@ error_page 520 /error/HTTP520.html;
 error_page 521 /error/HTTP521.html;
 error_page 533 /error/HTTP533.html;
 ```
-I use custom HTTP error pages and I used this for creating them: https://github.com/AndiDittrich/HttpErrorPages
+<br> This server redirects all of the unencrypted connections to https. It uses the same url, except when it's accessed over the IP address, then it redirects to the root of the domain.
 ```
 
 server {
@@ -150,7 +175,8 @@ server {
   return 301 https://$host$request_uri;
 }
 ```
-This server redirects all of the unencrypted connections to https. It uses the same url, except when it's accessed over the IP address, then it redirects to the root of the domain.
+<br> This server redirects unused subdomains.
+
 ```
 server {
   listen 4430 ssl http2;
@@ -161,7 +187,7 @@ server {
   include /sites-enabled/headers.conf;
 }
 ```
-This server redirects unused subdomains.
+<br> This is the server that listens on the root of the domain, in my case it redirects to the `media` subdomain.
 ```
 server {
   listen 4430 ssl http2 default_server;
@@ -179,7 +205,8 @@ server {
 
   }
 ```
-This is the server that listens on the root of the domain, in my case it redirects to the `media` subdomain.
+<br> I use [Organizr](https://github.com/causefx/Organizr) to organize (duh) all of my apps I regularly use. Definitely check it out if you don't already use it, it's very actively developed and has so many features.
+This server also has all of the reverse proxies for my apps I open to the public.
 ```
 server {
     listen 4430 ssl http2;
@@ -282,7 +309,8 @@ server {
 
 	 }
 ```
-I use [Organizr](https://github.com/causefx/Organizr) to organize (duh) all of my apps I regularly use. Definitely check it out, it's very actively developed and has so many features.
+<br> I use a subdomain for Plex and you should be able to close the Plex port in your router if you use this if you add the subdomain to the `Custom server access URLs` in the Server settings of Plex. You need to use a environmental variable to set it if you use Docker like I do.
+
 ```
    upstream plex-upstream {
      server 192.168.1.126:32400;
@@ -345,7 +373,7 @@ I use [Organizr](https://github.com/causefx/Organizr) to organize (duh) all of m
      }
    }
 ```
-This server 
+<br>This is [Nextcloud](https://nextcloud.com), my personal cloud
 ```
    server {
      listen 4430 ssl http2;
@@ -425,7 +453,8 @@ This server
       }
 }
 ```
-This is [Nextcloud](https://nextcloud.com) which is my personal cloud.
+<br>My blog which you are reading right now is [Grav](https://getgrav.org)
+
 ```
 server {
   listen 4430 ssl http2;
@@ -474,58 +503,8 @@ fastcgi_buffers 64 4k;
 
 }
 ```
-My blog which is [Grav](https://getgrav.org)
-<br><br>
-```
-server {
-  listen 4430 ssl http2;
-  #listen [::]:4430 ssl http2;
-  server_name john.example.com;
-  #return 301 https://media.example.com$request_uri;
-  include /nginx/conf.d/hsts.conf;
-  include /sites-enabled/headers.conf;
+<br>
 
-  root /www/root;
-
-  index index.html index.php;
-
-  location /error/ {
-    alias /www/errorpages/;
-    internal;
-    }
-
-
-
-  location / {
-            try_files $uri $uri/ /index.php?_url=$uri&$query_string;
-        }
-
-  location ~ \.php$ {
-                fastcgi_pass unix:/php/run/php-fpm.sock;
-                fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                fastcgi_index index.php;
-                include fastcgi.conf;
-                #sfastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-                fastcgi_max_temp_file_size 0;
-
-fastcgi_buffer_size 4K;
-fastcgi_buffers 64 4k;
-
-        }
-
-        ## Begin - Security
-        # deny all direct access for these folders
-        location ~* /(.git|cache|bin|logs|backup|tests)/.*$ { return 403; }
-        # deny running scripts inside core system folders
-        location ~* /(system|vendor)/.*\.(txt|xml|md|html|yaml|php|pl|py|cgi|twig|sh|bat)$ { return 403; }
-        # deny running scripts inside user folder
-        location ~* /user/.*\.(txt|md|yaml|php|pl|py|cgi|twig|sh|bat)$ { return 403; }
-        # deny access to specific files in the root folder
-        location ~ /(LICENSE.txt|composer.lock|composer.json|nginx.conf|web.config|htaccess.txt|\.htaccess) { return 403; }
-        ## End - Security
-
-}
-```
 /sites-enabled/**headers.conf**
 ```
 add_header X-Frame-Options "ALLOW-FROM https://*.example.com" always;

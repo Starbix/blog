@@ -4,6 +4,7 @@ media_order: 'blog-header Kopie.jpg'
 sitemap:
     changefreq: weekly
 body_classes: 'header-image fullwidth'
+visible: true
 content:
     items: '@self.children'
     limit: 5
