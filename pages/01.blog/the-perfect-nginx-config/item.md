@@ -147,19 +147,8 @@ ssl_trusted_certificate /certs/example.com/fullchain.pem;
 
 ```
 error_page 400 401 402 403 404 500 501 502 503 520 521 533 /error/HTTP$status.html;
-
-error_page 401 /error/HTTP401.html;
-error_page 402 /error/HTTP402.html;
-error_page 403 /error/HTTP403.html;
-error_page 404 /error/HTTP404.html;
-error_page 500 /error/HTTP500.html;
-error_page 501 /error/HTTP501.html;
-error_page 502 /error/HTTP502.html;
-error_page 503 /error/HTTP503.html;
-error_page 520 /error/HTTP520.html;
-error_page 521 /error/HTTP521.html;
-error_page 533 /error/HTTP533.html;
 ```
+
 <br> This server redirects all of the unencrypted connections to https. It uses the same url, except when it's accessed over the IP address, then it redirects to the root of the domain.
 ```
 
@@ -181,7 +170,6 @@ server {
 ```
 server {
   listen 4430 ssl http2;
-  #listen [::]:4430 ssl http2;
   server_name www.example.com mail.example.com;
   return 301 https://example.com$request_uri;
   include /nginx/conf.d/hsts.conf;
