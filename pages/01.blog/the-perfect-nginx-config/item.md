@@ -146,7 +146,8 @@ ssl_trusted_certificate /certs/example.com/fullchain.pem;
 <br>I use custom HTTP error pages and I used this for creating them: https://github.com/AndiDittrich/HttpErrorPages
 
 ```
-error_page 400 /error/HTTP400.html;
+error_page 400 401 402 403 404 500 501 502 503 520 521 533 /error/HTTP$status.html;
+
 error_page 401 /error/HTTP401.html;
 error_page 402 /error/HTTP402.html;
 error_page 403 /error/HTTP403.html;
