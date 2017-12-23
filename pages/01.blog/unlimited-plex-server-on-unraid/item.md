@@ -86,7 +86,7 @@ fi
 fi
 exit
 ``` 
-**rclone_mount** - at Stopping of the Array
+**rclone_mount** - at Startup of the Array
 ```
 #!/bin/bash
 
