@@ -2,7 +2,7 @@
 title: 'Use Plex credentials for Nextcloud'
 media_order: '1.png,2.png,3.png,4.png,5.png,6.png,7.png,8.png'
 published: true
-publish_date: '16-02-2018 16:30'
+date: '16-02-2018 16:31'
 taxonomy:
     category:
         - blog
