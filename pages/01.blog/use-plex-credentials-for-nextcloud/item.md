@@ -11,6 +11,7 @@ taxonomy:
         - cloud
         - Nextcloud
         - LDAP
+visible: true
 header_image: '0'
 ---
 
