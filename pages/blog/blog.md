@@ -1,24 +1,28 @@
 ---
 title: Home
-media_order: 'blog-header.jpg'
+media_order: blog-header.jpg
 sitemap:
     changefreq: weekly
 body_classes: 'header-image fullwidth'
 visible: true
+blog_url: blog
+show_sidebar: true
+show_breadcrumbs: true
+show_pagination: true
 content:
-    items: '@self.children'
+    items:
+        - '@self.children'
     limit: 5
     order:
         by: date
         dir: desc
     pagination: true
     url_taxonomy_filters: true
-blog_url: blog
 feed:
     description: 'technology blog'
     limit: 10
 pagination: true
 ---
 
-# My Gravtastic Blog
+# blog.laubacher.io
 ## Plex, nginx, unRAID and more
