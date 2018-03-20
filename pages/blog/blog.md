@@ -3,6 +3,7 @@ title: Home
 media_order: blog-header.jpg
 sitemap:
     changefreq: weekly
+body_classes: header-animated
 visible: true
 hero_classes: 'text-light overlay-dark-gradient hero-medium parallax'
 hero_image: blog-header.jpg
