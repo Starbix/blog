@@ -5,7 +5,7 @@ sitemap:
     changefreq: weekly
 body_classes: 'header-dark header-fixed'
 visible: true
-hero_classes: overlay-light
+hero_classes: text-light
 blog_url: blog
 show_sidebar: true
 show_breadcrumbs: true
