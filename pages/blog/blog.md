@@ -25,5 +25,4 @@ feed:
 pagination: true
 ---
 
-# blog.laubacher.io
 ## Plex, nginx, unRAID and more
