@@ -1,9 +1,9 @@
 ---
 title: Home
-media_order: header.jpg
+media_order: blog-header.jpg
 sitemap:
     changefreq: weekly
-body_classes: 'header-image fullwidth'
+body_classes: header-dark
 visible: true
 blog_url: blog
 show_sidebar: true
