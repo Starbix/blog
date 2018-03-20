@@ -4,7 +4,7 @@ media_order: blog-header.jpg
 sitemap:
     changefreq: weekly
 visible: true
-hero_classes: 'text-light hero-medium'
+hero_classes: 'text-light overlay-light-gradient hero-medium parallax'
 hero_image: blog-header.jpg
 blog_url: blog
 show_sidebar: true
