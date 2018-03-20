@@ -3,7 +3,7 @@ title: Home
 media_order: blog-header.jpg
 sitemap:
     changefreq: weekly
-body_classes: header-dark
+body_classes: 'header-dark header-fixed'
 visible: true
 blog_url: blog
 show_sidebar: true
