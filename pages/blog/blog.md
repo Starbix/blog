@@ -1,6 +1,6 @@
 ---
 title: Home
-media_order: blog-header.jpg
+media_order: header.jpg
 sitemap:
     changefreq: weekly
 body_classes: 'header-image fullwidth'
