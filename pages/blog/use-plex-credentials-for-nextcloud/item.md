@@ -12,18 +12,22 @@ taxonomy:
         - Nextcloud
         - LDAP
 visible: true
+blog_url: /blog
+show_sidebar: true
+show_breadcrumbs: true
+show_pagination: true
 header_image: '0'
 ---
 
 This tutorial will show you how you can use your and your friend's Plex login to login to Nextcloud.
 
-## Setup LDAP-for-Plex
+### Setup LDAP-for-Plex
 
 First you need to setup [this](https://github.com/hjone72/LDAP-for-Plex) piece of software, you can install it natively or use my docker for which you can find the tutorial [here](https://github.com/Starbix/dockerimages/tree/master/plex-ldap).
 
 If you use unRAID you can add https://github.com/Starbix/docker-templates to your template repositories if you want to use the docker template.
 
-## Setup Nextcloud
+### Setup Nextcloud
 
 * You need to enable `LDAP user and group backend` in Nextcloud which is an official app.
 
