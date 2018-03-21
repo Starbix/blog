@@ -32,7 +32,8 @@ unRAID makes running a cloud based unlimited Plex server not as easy as it's on 
 - [unionfs](https://raw.githubusercontent.com/Starbix/unRAID-plugins/master/plugins/unionfs.plg)
 - [plexdrive](https://raw.githubusercontent.com/Starbix/unRAID-plugins/master/plugins/plexdrive.plg)
 
-To install the needed plugins, just enter ```
+To install the needed plugins, just enter 
+```
 https://raw.githubusercontent.com/Squidly271/community.applications/master/plugins/community.applications.plg
 ``` 
 to **Plugins > Install Plugin**.
