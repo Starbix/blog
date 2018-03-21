@@ -13,6 +13,10 @@ taxonomy:
         - radarr
         - unRAID
 visible: true
+blog_url: /blog
+show_sidebar: true
+show_breadcrumbs: true
+show_pagination: true
 ---
 
 This tutorial is not as detailed as https://hoarding.me so I suggest first reading through that tutorial to get a broad view of how it rclone, Sonarr and Radarr work with the cloud.
@@ -28,7 +32,10 @@ unRAID makes running a cloud based unlimited Plex server not as easy as it's on 
 - [unionfs](https://raw.githubusercontent.com/Starbix/unRAID-plugins/master/plugins/unionfs.plg)
 - [plexdrive](https://raw.githubusercontent.com/Starbix/unRAID-plugins/master/plugins/plexdrive.plg)
 
-To install the needed plugins, just enter this https://raw.githubusercontent.com/Squidly271/community.applications/master/plugins/community.applications.plg to **Plugins > Install Plugin**.
+To install the needed plugins, just enter ```
+https://raw.githubusercontent.com/Squidly271/community.applications/master/plugins/community.applications.plg
+``` 
+to **Plugins > Install Plugin**.
 After refreshing the site you should see a new Tab called **Apps**, under that Tab you just search for **User Scripts** and **rclone** and install both of those plugins.
 
 For our setup we also need unionfs and plexdrive for which I didn't find any plugin, so I wrote my own. Install it like Community Applications with https://raw.githubusercontent.com/Starbix/unRAID-plugins/master/plugins/unionfs.plg and https://raw.githubusercontent.com/Starbix/unRAID-plugins/master/plugins/plexdrive.plg.
