@@ -367,6 +367,9 @@ class Admin
         $ipKey = Uri::ip();
         $redirect = isset($post['redirect']) ? $post['redirect'] : $this->base . $this->route;
 
+        // Pseudonymization of the IP
+        $ipKey = sha1($ipKey . $this->grav['config']->get('security.salt'));
+
         // Check if the current IP has been used in failed login attempts.
         $attempts = count($rateLimiter->getAttempts($ipKey, 'ip'));
 
@@ -638,12 +641,12 @@ class Admin
             $data[$type] = $obj;
         } elseif (preg_match('|users/|', $type)) {
             $obj = User::load(preg_replace('|users/|', '', $type));
-            $obj->merge($post);
+            $obj->merge($this->cleanUserPost($post));
 
             $data[$type] = $obj;
         } elseif (preg_match('|user/|', $type)) {
             $obj = User::load(preg_replace('|user/|', '', $type));
-            $obj->merge($post);
+            $obj->merge($this->cleanUserPost($post));
 
             $data[$type] = $obj;
         } elseif (preg_match('|config/|', $type)) {
@@ -686,6 +689,26 @@ class Admin
         }
 
         return $data[$type];
+    }
+
+    /**
+     * Clean user form post and remove extra stuff that may be passed along
+     *
+     * @param $post
+     * @return array
+     */
+    protected function cleanUserPost($post)
+    {
+        // Clean fields for all users
+        unset($post['hashed_password']);
+
+        // Clean field for users who shouldn't be able to modify these fields
+        if (!$this->authorize(['admin.user', 'admin.super'])) {
+            unset($post['access']);
+            unset($post['state']);
+        }
+
+        return $post;
     }
 
     protected function hasErrorMessage()
@@ -1372,9 +1395,9 @@ class Admin
         return $found_fields;
     }
 
-    public function getPagePathFromToken($path)
+    public function getPagePathFromToken($path, $page = null)
     {
-        return Utils::getPagePathFromToken($path, $this->page(true));
+        return Utils::getPagePathFromToken($path, $page ?: $this->page(true));
     }
 
     /**
