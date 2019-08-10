@@ -11,7 +11,7 @@ taxonomy:
 visible: true
 ---
 
-I use docker for all of my applications running on my unRAID server, but for nginx I didn't find any image that fulfilled all my needs. So I wrote my own dockerimage which you can find here: https://github.com/Starbix/dockerimages/tree/master/nginx. 
+I use docker for all of my applications running on my unRAID server, but for nginx I didn't find any image that fulfilled all my needs. So I wrote my own dockerimage which you can find here: https://github.com/Starbix/dockerimages/tree/master/nginx.
 
 The following is my config and should explain what most things do and why.
 
@@ -49,8 +49,8 @@ http {
                           'ut="$upstream_response_time" ul="$upstream_response_length" '
                           'cs=$upstream_cache_status' ;
 
-    access_log /nginx/log/nginx_access.log main_ext;
-    error_log /nginx/log/nginx_error.log warn;
+    access_log /nginx/logs/nginx_access.log main_ext;
+    error_log /nginx/logs/nginx_error.log warn;
 ```
 <br>The maximum upload size is 25GB
 nginx doesn't send that the webserver is `nginx` but `server`
@@ -93,14 +93,14 @@ nginx doesn't send that the webserver is `nginx` but `server`
         font/opentype
         image/svg+xml;
 ```
-<br> This will include all config files from /sites-enabled. The following configuration is the part you'll configure yourself. 
+<br> This will include all config files from /sites-enabled. The following configuration is the part you'll configure yourself.
 ```
     include /sites-enabled/*.conf;
     include /nginx/custom_sites/*.conf;
     include /nginx/conf.d/stub_status.conf;
 }
 ```
-The preceding configuration is part of the included nginx.conf of my Dockerimage. 
+The preceding configuration is part of the included nginx.conf of my Dockerimage.
 <br>
 
 /sites-enabled/**default.conf**
@@ -108,9 +108,7 @@ The preceding configuration is part of the included nginx.conf of my Dockerimage
 These TLS parameters currently result in a 100% score in all categories on https://www.ssllabs.com/ssltest
 
 - OCSP stapling is enabled you can learn more about it [here](https://scotthelme.co.uk/ocsp-stapling-speeding-up-ssl/)
-- Dynamic TLS Records is enabled which is a patch from [cloudflare](https://blog.cloudflare.com/optimizing-tls-over-tcp-to-reduce-latency/)
 - I use [hybrid certificates](https://scotthelme.co.uk/hybrid-rsa-and-ecdsa-certificates-with-nginx/)
-- [CT](https://www.certificate-transparency.org) support is compiled in using [this module](https://github.com/grahamedgecombe/nginx-ct) to use it you need to submit your certificates to a CT log, you can do it using [this program](https://github.com/grahamedgecombe/ct-submit)
 
 ```
 upstream php-handler {
@@ -118,7 +116,7 @@ upstream php-handler {
 }
 
 ssl_protocols TLSv1.2 TLSv1.3;
-ssl_ciphers TLS13-AES-256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384;
+ssl_ciphers [TLS13+AESGCM+AES256|TLS13+CHACHA20]:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
 ssl_ecdh_curve secp521r1:secp384r1;
 ssl_prefer_server_ciphers on;
 ssl_session_cache shared:SSL:20m;
@@ -135,11 +133,6 @@ ssl_certificate_key /certs/example.com/key.pem;
 ssl_certificate /certs/example.com_ecc/fullchain.pem;
 ssl_certificate_key /certs/example.com_ecc/key.pem;
 
-ssl_ct on;
-ssl_ct_static_scts /certs/example.com;
-ssl_ct_static_scts /certs/example.com_ecc;
-
-ssl_dhparam /certs/dhparam.pem;
 ssl_trusted_certificate /certs/example.com/fullchain.pem;
 ```
 <br>I use custom HTTP error pages and I used this for creating them: https://github.com/AndiDittrich/HttpErrorPages
@@ -168,7 +161,7 @@ server {
 ```
 server {
   listen 4430 ssl http2;
-  server_name www.example.com mail.example.com;
+  server_name www.example.com;
   return 301 https://example.com$request_uri;
   include /nginx/conf.d/hsts.conf;
   include /sites-enabled/headers.conf;
@@ -490,9 +483,48 @@ fastcgi_buffers 64 4k;
 
 }
 ```
+<br>I store my passwords on [Bitwarden](https://bitwarden.com)
+```
+server {
+ listen 4430 ssl http2;
+ #listen [::]:4430 ssl http2;
+ server_name  bitwarden.laubacher.io;
+ include /nginx/conf.d/hsts.conf;
+ include /includes/laubacher.tls.conf;
+ include /includes/headers.conf;
+ add_header X-Robots-Tag none;
+
+ client_max_body_size 128M;
+
+ location /error/ {
+   alias /www/errorpages/;
+   internal;
+   }
+
+
+ location / {
+     proxy_pass        http://192.168.1.126:8343;
+     proxy_set_header Host $host;
+     proxy_set_header X-Real-IP $remote_addr;
+     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+     proxy_set_header X-Forwarded-Proto $scheme;
+ }
+
+ location /notifications/hub {
+  proxy_pass http://192.168.1.126:3012;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+}
+
+location /notifications/hub/negotiate {
+  proxy_pass http://192.168.1.126:8343;
+}
+}
+```
+
 <br>
 
-/sites-enabled/**headers.conf**
+/includes/**headers.conf**
 ```
 add_header X-Frame-Options "ALLOW-FROM https://*.example.com" always;
 add_header X-Content-Type-Options "nosniff";
@@ -502,4 +534,51 @@ add_header Expect-CT "enforce; max-age=86400; report-uri=https://laubacher.repor
 add_header Expect-Staple "max-age=31536000; report-uri=https://laubacher.report-uri.io/r/default/staple/reportOnly; includeSubDomains; preload";
 add_header Content-Security-Policy "frame-ancestors https://*.example.com https://example.com";
 add_header X-Robots-Tag none;
+```
+Here the blocked countries get a `444` response.
+```
+# COUNTRY GEO BLOCK
+if ($allowed_country = no) {
+  return 444;
+}
+```
+
+<br>
+
+If you want to know more about blocking certain IPs with GeoIP2, check out [this guide](https://technicalramblings.com/blog/blocking-countries-with-geolite2-using-the-letsencrypt-docker-container/).
+/sites-enabled/**geoip.conf**
+```
+geoip2 /includes/geolite2/GeoLite2-Country.mmdb {
+  auto_reload 1d;
+  $geoip2_data_country_code country iso_code;
+  $geoip2_data_continent_name continent names en;
+}
+# GEO IP BLOCK SITE 1
+map $geoip2_data_country_code $allowed_country {
+    default yes;
+    CN no; #China
+    RU no; #Russia
+    HK no; #Hong Kong
+    IN no; #India
+    IR no; #Iran
+    VN no; #Vietnam
+    TR no; #Turkey
+    EG no; #Egypt
+    MX no; #Mexico
+    JP no; #Japan
+    KR no; #South Korea
+    KP no; #North Korea 🙂
+    PE no; #Peru
+    BR no; #Brazil
+    UA no; #Ukraine
+    ID no; #Indonesia
+    TH no; #Thailand
+    AE no;
+    AF no;
+    SA no;
+    MY no;
+    BY no;
+    MD no;
+    AL no;
+  }
 ```
