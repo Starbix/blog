@@ -126,7 +126,7 @@ ssl_session_timeout 15m;
 ssl_session_tickets off;
 ssl_stapling on;
 ssl_dyn_rec_enable on;
-resolver 8.8.8.8 8.8.4.4 ipv6=off;
+resolver 1.1.1.1 1.0.0.1 ipv6=off;
 ssl_stapling_verify on;
 #RSA certificates
 ssl_certificate /certs/example.com/fullchain.pem;
