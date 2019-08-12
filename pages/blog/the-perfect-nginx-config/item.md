@@ -546,6 +546,7 @@ if ($allowed_country = no) {
 <br>
 
 If you want to know more about blocking certain IPs with GeoIP2, check out [this guide](https://technicalramblings.com/blog/blocking-countries-with-geolite2-using-the-letsencrypt-docker-container/).
+
 /sites-enabled/**geoip.conf**
 ```
 geoip2 /includes/geolite2/GeoLite2-Country.mmdb {
