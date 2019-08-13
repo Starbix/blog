@@ -567,7 +567,6 @@ map $geoip2_data_country_code $allowed_country {
     EG no; #Egypt
     MX no; #Mexico
     JP no; #Japan
-    KR no; #South Korea
     KP no; #North Korea 🙂
     PE no; #Peru
     BR no; #Brazil
